@@ -11,14 +11,17 @@ export class TodoService {
     private readonly todoRepository: TypeormTodoRepository,
   ) {}
 
+  // Create a new todo 
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     return await this.todoRepository.create(createTodoDto);
   }
 
+  // Retrieve all todos, optionally filtered by status
   async findAll(status?: TodoStatus): Promise<Todo[]> {
     return await this.todoRepository.findAll(status);
   }
 
+  // Retrieve a single todo by its ID
   async findOne(id: string): Promise<Todo> {
     const todo = await this.todoRepository.findById(id);
     if (!todo) {
@@ -27,6 +30,7 @@ export class TodoService {
     return todo;
   }
 
+  // Update an existing todo
   async update(id: string, updateTodoDto: UpdateTodoDto): Promise<Todo> {
     const existingTodo = await this.todoRepository.findById(id);
     if (!existingTodo) {
@@ -36,6 +40,7 @@ export class TodoService {
     return await this.todoRepository.update(id, updateTodoDto);
   }
 
+  // Delete a todo by its ID
   async remove(id: string): Promise<void> {
     const existingTodo = await this.todoRepository.findById(id);
     if (!existingTodo) {
