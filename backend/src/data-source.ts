@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { Todo } from './modules/todo/todo.entity';
+import { User } from './modules/auth/user.entity';
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'todo_app',
   synchronize: false,
   logging: true,
-  entities: [Todo],
+  entities: [Todo, User],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
 });

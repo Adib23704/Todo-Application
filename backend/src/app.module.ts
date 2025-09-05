@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TodoModule } from './modules/todo/todo.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TodoModule } from './modules/todo/todo.module';
       logging: process.env.NODE_ENV === 'development',
     }),
     TodoModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
