@@ -2,7 +2,6 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { Todo } from './modules/todo/todo.entity';
 
-// Load environment variables from .env file
 dotenv.config();
 
 export const AppDataSource = new DataSource({
