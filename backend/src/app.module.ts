@@ -21,6 +21,8 @@ import { AuthModule } from './modules/auth/auth.module';
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production', // Only for development
       logging: process.env.NODE_ENV === 'development',
+      migrations: [__dirname + '/migrations/*{.js,.ts}'],
+      migrationsRun: process.env.NODE_ENV === 'production',
     }),
     TodoModule,
     AuthModule,

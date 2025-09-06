@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TodoForm from '../TodoForm';
-import { TodoStatus } from '@/types';
 
 describe('TodoForm', () => {
   const mockOnSubmit = jest.fn();
@@ -117,7 +116,6 @@ describe('TodoForm', () => {
 
     expect(submitButton).toBeDisabled();
   });
-
 
   it('handles form submission with Enter key', async () => {
     const user = userEvent.setup();

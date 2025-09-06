@@ -72,7 +72,6 @@ describe('TodoItem', () => {
     expect(mockOnDelete).toHaveBeenCalledWith('1');
   });
 
-
   it('enters edit mode when edit button is clicked', async () => {
     const user = userEvent.setup();
 
