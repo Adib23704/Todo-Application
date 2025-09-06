@@ -22,7 +22,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = localStorage.getItem('token');
     if (token) {
       apiClient.setToken(token);
-      setLoading(false);
+      apiClient
+        .get<User>('/auth/me')
+        .then(userData => {
+          setUser(userData);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Token validation failed:', error);
+          apiClient.clearToken();
+          setLoading(false);
+        });
     } else {
       setLoading(false);
     }

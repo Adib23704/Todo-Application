@@ -14,11 +14,10 @@ describe('TodoForm', () => {
   it('renders form fields correctly', () => {
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
-    expect(screen.getByLabelText('Title')).toBeInTheDocument();
+    expect(screen.getByLabelText('Title *')).toBeInTheDocument();
     expect(screen.getByLabelText('Description')).toBeInTheDocument();
-    expect(screen.getByLabelText('Status')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add Todo' })
+      screen.getByRole('button', { name: '+ Add Todo' })
     ).toBeInTheDocument();
   });
 
@@ -27,20 +26,17 @@ describe('TodoForm', () => {
 
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
-    const titleInput = screen.getByLabelText('Title');
+    const titleInput = screen.getByLabelText('Title *');
     const descriptionInput = screen.getByLabelText('Description');
-    const statusSelect = screen.getByLabelText('Status');
-    const submitButton = screen.getByRole('button', { name: 'Add Todo' });
+    const submitButton = screen.getByRole('button', { name: '+ Add Todo' });
 
     await user.type(titleInput, 'Test Todo');
     await user.type(descriptionInput, 'Test Description');
-    await user.selectOptions(statusSelect, TodoStatus.IN_PROGRESS);
     await user.click(submitButton);
 
     expect(mockOnSubmit).toHaveBeenCalledWith({
       title: 'Test Todo',
       description: 'Test Description',
-      status: TodoStatus.IN_PROGRESS,
     });
   });
 
@@ -49,10 +45,9 @@ describe('TodoForm', () => {
 
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
-    const titleInput = screen.getByLabelText('Title');
+    const titleInput = screen.getByLabelText('Title *');
     const descriptionInput = screen.getByLabelText('Description');
-    const statusSelect = screen.getByLabelText('Status');
-    const submitButton = screen.getByRole('button', { name: 'Add Todo' });
+    const submitButton = screen.getByRole('button', { name: '+ Add Todo' });
 
     await user.type(titleInput, 'Test Todo');
     await user.type(descriptionInput, 'Test Description');
@@ -61,7 +56,6 @@ describe('TodoForm', () => {
     await waitFor(() => {
       expect(titleInput).toHaveValue('');
       expect(descriptionInput).toHaveValue('');
-      expect(statusSelect).toHaveValue(TodoStatus.PENDING);
     });
   });
 
@@ -71,7 +65,7 @@ describe('TodoForm', () => {
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
     const descriptionInput = screen.getByLabelText('Description');
-    const submitButton = screen.getByRole('button', { name: 'Add Todo' });
+    const submitButton = screen.getByRole('button', { name: '+ Add Todo' });
 
     await user.type(descriptionInput, 'Test Description');
     await user.click(submitButton);
@@ -84,8 +78,8 @@ describe('TodoForm', () => {
 
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
-    const titleInput = screen.getByLabelText('Title');
-    const submitButton = screen.getByRole('button', { name: 'Add Todo' });
+    const titleInput = screen.getByLabelText('Title *');
+    const submitButton = screen.getByRole('button', { name: '+ Add Todo' });
 
     await user.type(titleInput, '   ');
     await user.click(submitButton);
@@ -96,7 +90,7 @@ describe('TodoForm', () => {
   it('disables submit button when loading', () => {
     render(<TodoForm onSubmit={mockOnSubmit} loading={true} />);
 
-    const submitButton = screen.getByRole('button', { name: 'Adding...' });
+    const submitButton = screen.getByRole('button', { name: 'Creating...' });
 
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveClass(
@@ -110,11 +104,11 @@ describe('TodoForm', () => {
 
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
-    const submitButton = screen.getByRole('button', { name: 'Add Todo' });
+    const submitButton = screen.getByRole('button', { name: '+ Add Todo' });
 
     expect(submitButton).toBeDisabled();
 
-    const titleInput = screen.getByLabelText('Title');
+    const titleInput = screen.getByLabelText('Title *');
     await user.type(titleInput, 'Test');
 
     expect(submitButton).toBeEnabled();
@@ -124,42 +118,18 @@ describe('TodoForm', () => {
     expect(submitButton).toBeDisabled();
   });
 
-  it('has correct default status value', () => {
-    render(<TodoForm onSubmit={mockOnSubmit} />);
-
-    const statusSelect = screen.getByLabelText('Status');
-    expect(statusSelect).toHaveValue(TodoStatus.PENDING);
-  });
-
-  it('allows selection of different status values', async () => {
-    const user = userEvent.setup();
-
-    render(<TodoForm onSubmit={mockOnSubmit} />);
-
-    const statusSelect = screen.getByLabelText('Status');
-
-    await user.selectOptions(statusSelect, TodoStatus.IN_PROGRESS);
-    expect(statusSelect).toHaveValue(TodoStatus.IN_PROGRESS);
-
-    await user.selectOptions(statusSelect, TodoStatus.DONE);
-    expect(statusSelect).toHaveValue(TodoStatus.DONE);
-
-    await user.selectOptions(statusSelect, TodoStatus.PENDING);
-    expect(statusSelect).toHaveValue(TodoStatus.PENDING);
-  });
 
   it('handles form submission with Enter key', async () => {
     const user = userEvent.setup();
 
     render(<TodoForm onSubmit={mockOnSubmit} />);
 
-    const titleInput = screen.getByLabelText('Title');
+    const titleInput = screen.getByLabelText('Title *');
     await user.type(titleInput, 'Test Todo{enter}');
 
     expect(mockOnSubmit).toHaveBeenCalledWith({
       title: 'Test Todo',
       description: '',
-      status: TodoStatus.PENDING,
     });
   });
 });

@@ -44,7 +44,7 @@ export class TodoController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
     return this.todoService.remove(id);
   }

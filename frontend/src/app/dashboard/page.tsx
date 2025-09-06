@@ -14,16 +14,19 @@ export default function DashboardPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<TodoStatus | 'ALL'>('ALL');
-  const { user, logout } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (authLoading) {
+      return; // Wait for auth to finish loading
+    }
     if (!user) {
       router.push('/auth/login');
       return;
     }
     fetchTodos();
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   const fetchTodos = async () => {
     try {
@@ -53,7 +56,7 @@ export default function DashboardPage() {
   };
 
   const handleUpdateTodo = async (
-    id: number,
+    id: string,
     data: { title?: string; description?: string; status?: TodoStatus }
   ) => {
     try {
@@ -65,14 +68,18 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDeleteTodo = async (id: number) => {
+  const handleDeleteTodo = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this todo?')) {
       return;
     }
 
     try {
-      await apiClient.delete(`/todos/${id}`);
-      setTodos(prev => prev.filter(todo => todo.id !== id));
+      const data = await apiClient.delete<any>(`/todos/${id}`);
+      if (data.status === true) {
+        setTodos(prev => prev.filter(todo => todo.id !== id));
+      } else {
+        setError(data.message || 'Failed to delete todo');
+      }
     } catch (err: any) {
       setError('Failed to delete todo');
       console.error(err);
@@ -85,7 +92,7 @@ export default function DashboardPage() {
   const getTodoCountByStatus = (status: TodoStatus) =>
     todos.filter(todo => todo.status === status).length;
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className='min-h-screen flex items-center justify-center'>
         <div className='text-lg'>Loading...</div>
@@ -217,41 +224,63 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-4 gap-8'>
           <div className='lg:col-span-1'>
             <TodoForm onSubmit={handleCreateTodo} loading={creating} />
           </div>
 
-          <div className='lg:col-span-2'>
-            <div className='bg-white shadow rounded-lg'>
+          <div className='lg:col-span-3'>
+            <div className='bg-white border border-gray-200 rounded-lg shadow-sm'>
               <div className='px-6 py-4 border-b border-gray-200'>
                 <div className='flex justify-between items-center'>
-                  <h2 className='text-lg font-semibold text-gray-900'>
-                    Your Todos
-                  </h2>
+                  <div>
+                    <h2 className='text-lg font-semibold text-gray-900'>
+                      Your Todos
+                    </h2>
+                    <p className='mt-1 text-sm text-gray-500'>
+                      {filteredTodos.length}{' '}
+                      {filteredTodos.length === 1 ? 'todo' : 'todos'}
+                      {filter !== 'ALL' && (
+                        <span>
+                          {' '}
+                          • filtered by {filter.toLowerCase().replace('_', ' ')}
+                        </span>
+                      )}
+                    </p>
+                  </div>
                   <select
                     value={filter}
                     onChange={e =>
                       setFilter(e.target.value as TodoStatus | 'ALL')
                     }
-                    className='px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                    className='px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
                   >
-                    <option value='ALL'>All Todos</option>
-                    <option value={TodoStatus.PENDING}>Pending</option>
-                    <option value={TodoStatus.IN_PROGRESS}>In Progress</option>
-                    <option value={TodoStatus.DONE}>Completed</option>
+                    <option value='ALL'>📋 All Todos</option>
+                    <option value={TodoStatus.PENDING}>🟡 Pending</option>
+                    <option value={TodoStatus.IN_PROGRESS}>
+                      🔵 In Progress
+                    </option>
+                    <option value={TodoStatus.DONE}>🟢 Completed</option>
                   </select>
                 </div>
               </div>
               <div className='p-6'>
                 {filteredTodos.length === 0 ? (
-                  <p className='text-gray-500 text-center py-8'>
-                    {filter === 'ALL'
-                      ? 'No todos yet. Create your first todo!'
-                      : `No ${filter.toLowerCase().replace('_', ' ')} todos.`}
-                  </p>
+                  <div className='text-center py-12'>
+                    <div className='text-6xl mb-4'>
+                      {filter === 'ALL' ? '📝' : '🔍'}
+                    </div>
+                    <h3 className='text-lg font-medium text-gray-900 mb-2'>
+                      {filter === 'ALL' ? 'No todos yet' : 'No matching todos'}
+                    </h3>
+                    <p className='text-gray-500'>
+                      {filter === 'ALL'
+                        ? 'Create your first todo to get started!'
+                        : `No ${filter.toLowerCase().replace('_', ' ')} todos found.`}
+                    </p>
+                  </div>
                 ) : (
-                  <div className='space-y-4'>
+                  <div className='space-y-3'>
                     {filteredTodos.map(todo => (
                       <TodoItem
                         key={todo.id}

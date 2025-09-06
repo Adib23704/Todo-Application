@@ -64,7 +64,7 @@ export class TodoService {
   }
 
   // Delete a todo by its ID
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<{ status: boolean; message: string }> {
     console.log('Deleting todo');
 
     const existingTodo = await this.todoRepository.findById(id);
@@ -76,5 +76,7 @@ export class TodoService {
     await this.todoRepository.delete(id);
 
     console.log('Todo deleted successfully');
+
+    return { status: true, message: 'Todo deleted successfully' };
   }
 }

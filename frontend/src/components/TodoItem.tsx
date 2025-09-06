@@ -6,10 +6,10 @@ import { Todo, TodoStatus } from '@/types';
 interface TodoItemProps {
   todo: Todo;
   onUpdate: (
-    id: number,
+    id: string,
     data: { title?: string; description?: string; status?: TodoStatus }
   ) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
@@ -50,16 +50,16 @@ export default function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
   };
 
   return (
-    <div className='bg-white shadow rounded-lg p-6 border border-gray-200'>
+    <div className='bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200'>
       {isEditing ? (
-        <div className='space-y-4'>
+        <div className='p-4 space-y-4'>
           <input
             type='text'
             value={editData.title}
             onChange={e =>
               setEditData(prev => ({ ...prev, title: e.target.value }))
             }
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'
+            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
             placeholder='Todo title'
           />
           <textarea
@@ -67,78 +67,83 @@ export default function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
             onChange={e =>
               setEditData(prev => ({ ...prev, description: e.target.value }))
             }
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'
+            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
             placeholder='Todo description'
             rows={3}
           />
-          <div className='flex space-x-2'>
-            <button
-              onClick={handleSave}
-              className='px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700'
-            >
-              Save
-            </button>
+          <div className='flex justify-end space-x-2'>
             <button
               onClick={handleCancel}
-              className='px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700'
+              className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500'
             >
               Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className='px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+            >
+              Save Changes
             </button>
           </div>
         </div>
       ) : (
-        <div>
-          <div className='flex justify-between items-start mb-2'>
-            <h3 className='text-lg font-semibold text-gray-900'>
-              {todo.title}
-            </h3>
-            <span
-              className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(todo.status)}`}
-            >
-              {todo.status.replace('_', ' ')}
-            </span>
+        <div className='p-4'>
+          <div className='flex items-start justify-between mb-3'>
+            <div className='flex-1 min-w-0'>
+              <h3 className='text-lg font-medium text-gray-900 truncate'>
+                {todo.title}
+              </h3>
+              {todo.description && (
+                <p className='mt-1 text-sm text-gray-600 line-clamp-2'>
+                  {todo.description}
+                </p>
+              )}
+            </div>
+            <div className='ml-4 flex-shrink-0'>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(todo.status)}`}
+              >
+                {todo.status.replace('_', ' ')}
+              </span>
+            </div>
           </div>
-          <p className='text-gray-600 mb-4'>{todo.description}</p>
-          <div className='flex justify-between items-center'>
-            <div className='space-x-2'>
+
+          <div className='flex items-center justify-between pt-3 border-t border-gray-100'>
+            <div className='flex items-center space-x-3'>
               <select
                 value={todo.status}
                 onChange={e => handleStatusChange(e.target.value as TodoStatus)}
-                className='px-2 py-1 border border-gray-300 rounded text-sm text-black focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                className='text-sm border border-gray-300 rounded-md px-2 py-1 text-black focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
               >
-                <option value={TodoStatus.PENDING}>Pending</option>
-                <option value={TodoStatus.IN_PROGRESS}>In Progress</option>
-                <option value={TodoStatus.DONE}>Done</option>
+                <option value={TodoStatus.PENDING}>📋 Pending</option>
+                <option value={TodoStatus.IN_PROGRESS}>⏳ In Progress</option>
+                <option value={TodoStatus.DONE}>✅ Done</option>
               </select>
+
+              <div className='text-xs text-gray-500'>
+                {new Date(todo.createdAt).toLocaleDateString()}
+                {todo.updatedAt !== todo.createdAt && (
+                  <span className='ml-1'>(updated)</span>
+                )}
+              </div>
             </div>
-            <div className='space-x-2'>
+
+            <div className='flex items-center space-x-2'>
               <button
                 onClick={() => setIsEditing(true)}
-                className='px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700'
+                className='inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                title='Edit todo'
               >
-                Edit
+                ✏️ Edit
               </button>
               <button
-                onClick={() => {
-                  if (
-                    window.confirm('Are you sure you want to delete this todo?')
-                  ) {
-                    onDelete(todo.id);
-                  }
-                }}
-                className='px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700'
+                onClick={() => onDelete(todo.id)}
+                className='inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500'
+                title='Delete todo'
               >
-                Delete
+                🗑️ Delete
               </button>
             </div>
-          </div>
-          <div className='mt-2 text-xs text-gray-500'>
-            Created: {new Date(todo.createdAt).toLocaleDateString()}
-            {todo.updatedAt !== todo.createdAt && (
-              <span className='ml-2'>
-                Updated: {new Date(todo.updatedAt).toLocaleDateString()}
-              </span>
-            )}
           </div>
         </div>
       )}

@@ -5,13 +5,12 @@ import TodoItem from '../TodoItem';
 import { TodoStatus } from '@/types';
 
 const mockTodo = {
-  id: 1,
+  id: '1',
   title: 'Test Todo',
   description: 'Test Description',
   status: TodoStatus.PENDING,
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z',
-  userId: 1,
 };
 
 describe('TodoItem', () => {
@@ -51,7 +50,7 @@ describe('TodoItem', () => {
     const statusSelect = screen.getByRole('combobox');
     await user.selectOptions(statusSelect, TodoStatus.IN_PROGRESS);
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(1, {
+    expect(mockOnUpdate).toHaveBeenCalledWith('1', {
       status: TodoStatus.IN_PROGRESS,
     });
   });
@@ -59,8 +58,6 @@ describe('TodoItem', () => {
   it('calls onDelete when delete button is clicked', async () => {
     const user = userEvent.setup();
 
-    window.confirm = jest.fn(() => true);
-
     render(
       <TodoItem
         todo={mockTodo}
@@ -69,33 +66,12 @@ describe('TodoItem', () => {
       />
     );
 
-    const deleteButton = screen.getByText('Delete');
+    const deleteButton = screen.getByText('🗑️ Delete');
     await user.click(deleteButton);
 
-    expect(mockOnDelete).toHaveBeenCalledWith(1);
-    expect(window.confirm).toHaveBeenCalledWith(
-      'Are you sure you want to delete this todo?'
-    );
+    expect(mockOnDelete).toHaveBeenCalledWith('1');
   });
 
-  it('does not call onDelete when user cancels confirmation', async () => {
-    const user = userEvent.setup();
-
-    window.confirm = jest.fn(() => false);
-
-    render(
-      <TodoItem
-        todo={mockTodo}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-      />
-    );
-
-    const deleteButton = screen.getByText('Delete');
-    await user.click(deleteButton);
-
-    expect(mockOnDelete).not.toHaveBeenCalled();
-  });
 
   it('enters edit mode when edit button is clicked', async () => {
     const user = userEvent.setup();
@@ -108,12 +84,12 @@ describe('TodoItem', () => {
       />
     );
 
-    const editButton = screen.getByText('Edit');
+    const editButton = screen.getByText('✏️ Edit');
     await user.click(editButton);
 
     expect(screen.getByDisplayValue('Test Todo')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Test Description')).toBeInTheDocument();
-    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
@@ -128,17 +104,17 @@ describe('TodoItem', () => {
       />
     );
 
-    const editButton = screen.getByText('Edit');
+    const editButton = screen.getByText('✏️ Edit');
     await user.click(editButton);
 
     const titleInput = screen.getByDisplayValue('Test Todo');
     await user.clear(titleInput);
     await user.type(titleInput, 'Updated Todo');
 
-    const saveButton = screen.getByText('Save');
+    const saveButton = screen.getByText('Save Changes');
     await user.click(saveButton);
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(1, {
+    expect(mockOnUpdate).toHaveBeenCalledWith('1', {
       title: 'Updated Todo',
       description: 'Test Description',
     });
@@ -155,7 +131,7 @@ describe('TodoItem', () => {
       />
     );
 
-    const editButton = screen.getByText('Edit');
+    const editButton = screen.getByText('✏️ Edit');
     await user.click(editButton);
 
     const titleInput = screen.getByDisplayValue('Test Todo');
@@ -225,7 +201,7 @@ describe('TodoItem', () => {
       />
     );
 
-    expect(screen.getByText(/Created: 1\/1\/2023/)).toBeInTheDocument();
-    expect(screen.getByText(/Updated: 1\/2\/2023/)).toBeInTheDocument();
+    expect(screen.getByText('1/1/2023')).toBeInTheDocument();
+    expect(screen.getByText('(updated)')).toBeInTheDocument();
   });
 });

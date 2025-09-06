@@ -5,13 +5,12 @@ export enum TodoStatus {
 }
 
 export interface Todo {
-  id: number;
+  id: string;
   title: string;
   description: string;
   status: TodoStatus;
   createdAt: string;
   updatedAt: string;
-  userId: number;
 }
 
 export interface CreateTodoDto {
@@ -27,7 +26,7 @@ export interface UpdateTodoDto {
 }
 
 export interface User {
-  id: number;
+  id: string;
   username: string;
   email: string;
   createdAt: string;

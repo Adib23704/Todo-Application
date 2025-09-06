@@ -20,7 +20,9 @@ export class AuthService {
   ) {}
 
   // Register a new user
-  async register(registerDto: RegisterDto): Promise<{ token: string, user: User }> {
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ token: string; user: User }> {
     const { username, email, password } = registerDto;
 
     console.log('User registration attempt');
@@ -30,7 +32,9 @@ export class AuthService {
     });
     if (existingUser) {
       console.log('Registration failed: User already exists');
-      throw new ConflictException('User with this email or username already exists');
+      throw new ConflictException(
+        'User with this email or username already exists',
+      );
     }
 
     const saltRounds = 10;
@@ -53,7 +57,7 @@ export class AuthService {
   }
 
   // Login an existing user
-  async login(loginDto: LoginDto): Promise<{ token: string, user: User }> {
+  async login(loginDto: LoginDto): Promise<{ token: string; user: User }> {
     const { email, password } = loginDto;
 
     console.log('User login attempt');
