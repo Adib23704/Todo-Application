@@ -10,10 +10,15 @@ export class TodoService {
   constructor(private readonly todoRepository: TypeormTodoRepository) {}
 
   // Create a new todo
-  async create(createTodoDto: CreateTodoDto): Promise<Todo> {
+  async create(createTodoDto: CreateTodoDto, userId: string): Promise<Todo> {
     console.log('Creating new todo');
 
-    const todo = await this.todoRepository.create(createTodoDto);
+    const todoData = {
+      ...createTodoDto,
+      userId,
+    };
+
+    const todo = await this.todoRepository.create(todoData);
 
     console.log('Todo created successfully');
 
@@ -21,10 +26,10 @@ export class TodoService {
   }
 
   // Retrieve all todos, optionally filtered by status
-  async findAll(status?: TodoStatus): Promise<Todo[]> {
+  async findAll(userId: string, status?: TodoStatus): Promise<Todo[]> {
     console.log('Retrieving todos');
 
-    const todos = await this.todoRepository.findAll(status);
+    const todos = await this.todoRepository.findAll(userId, status);
 
     console.log('Todos retrieved successfully');
 
@@ -32,13 +37,15 @@ export class TodoService {
   }
 
   // Retrieve a single todo by its ID
-  async findOne(id: string): Promise<Todo> {
+  async findOne(id: string, userId: string): Promise<Todo> {
     console.log('Retrieving todo by ID');
 
-    const todo = await this.todoRepository.findById(id);
+    const todo = await this.todoRepository.findById(id, userId);
     if (!todo) {
       console.log('Todo not found');
-      throw new NotFoundException(`Todo with ID ${id} not found`);
+      throw new NotFoundException(
+        `Todo with ID ${id} not found or not owned by user`,
+      );
     }
 
     console.log('Todo retrieved successfully');
@@ -47,16 +54,26 @@ export class TodoService {
   }
 
   // Update an existing todo
-  async update(id: string, updateTodoDto: UpdateTodoDto): Promise<Todo> {
+  async update(
+    id: string,
+    userId: string,
+    updateTodoDto: UpdateTodoDto,
+  ): Promise<Todo> {
     console.log('Updating todo');
 
-    const existingTodo = await this.todoRepository.findById(id);
+    const existingTodo = await this.todoRepository.findById(id, userId);
     if (!existingTodo) {
       console.log('Update failed: Todo not found');
-      throw new NotFoundException(`Todo with ID ${id} not found`);
+      throw new NotFoundException(
+        `Todo with ID ${id} not found or not owned by user`,
+      );
     }
 
-    const updatedTodo = await this.todoRepository.update(id, updateTodoDto);
+    const updatedTodo = await this.todoRepository.update(
+      id,
+      userId,
+      updateTodoDto,
+    );
 
     console.log('Todo updated successfully');
 
@@ -64,16 +81,21 @@ export class TodoService {
   }
 
   // Delete a todo by its ID
-  async remove(id: string): Promise<{ status: boolean; message: string }> {
+  async remove(
+    id: string,
+    userId: string,
+  ): Promise<{ status: boolean; message: string }> {
     console.log('Deleting todo');
 
-    const existingTodo = await this.todoRepository.findById(id);
+    const existingTodo = await this.todoRepository.findById(id, userId);
     if (!existingTodo) {
       console.log('Delete failed: Todo not found');
-      throw new NotFoundException(`Todo with ID ${id} not found`);
+      throw new NotFoundException(
+        `Todo with ID ${id} not found or not owned by user`,
+      );
     }
 
-    await this.todoRepository.delete(id);
+    await this.todoRepository.delete(id, userId);
 
     console.log('Todo deleted successfully');
 

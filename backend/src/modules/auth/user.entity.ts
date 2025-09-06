@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('users')
@@ -19,6 +20,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 255 })
   password!: string;
+
+  @OneToMany('Todo', 'user')
+  todos!: any[];
 
   @CreateDateColumn()
   createdAt!: Date;

@@ -17,35 +17,37 @@ export class TypeormTodoRepository implements TodoRepository {
     return await this.todoRepository.save(todo);
   }
 
-  async findAll(status?: TodoStatus): Promise<Todo[]> {
+  async findAll(userId: string, status?: TodoStatus): Promise<Todo[]> {
+    const whereCondition: any = { userId };
     if (status) {
-      return await this.todoRepository.find({
-        where: { status },
-        order: { createdAt: 'DESC' },
-      });
+      whereCondition.status = status;
     }
+
     return await this.todoRepository.find({
+      where: whereCondition,
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findById(id: string): Promise<Todo | null> {
-    return await this.todoRepository.findOne({ where: { id } });
+  async findById(id: string, userId: string): Promise<Todo | null> {
+    return await this.todoRepository.findOne({
+      where: { id, userId },
+    });
   }
 
-  async update(id: string, data: Partial<Todo>): Promise<Todo> {
-    await this.todoRepository.update(id, data);
-    const updatedTodo = await this.findById(id);
+  async update(id: string, userId: string, data: Partial<Todo>): Promise<Todo> {
+    await this.todoRepository.update({ id, userId }, data);
+    const updatedTodo = await this.findById(id, userId);
     if (!updatedTodo) {
-      throw new Error(`Todo with ID ${id} not found`);
+      throw new Error(`Todo with ID ${id} not found or not owned by user`);
     }
     return updatedTodo;
   }
 
-  async delete(id: string): Promise<void> {
-    const result = await this.todoRepository.delete(id);
+  async delete(id: string, userId: string): Promise<void> {
+    const result = await this.todoRepository.delete({ id, userId });
     if (result.affected === 0) {
-      throw new Error(`Todo with ID ${id} not found`);
+      throw new Error(`Todo with ID ${id} not found or not owned by user`);
     }
   }
 }

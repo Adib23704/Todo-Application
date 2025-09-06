@@ -4,8 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { TodoStatus } from './todo-status.enum';
+import { User } from '../auth/user.entity';
 
 @Entity('todos')
 export class Todo {
@@ -24,6 +27,13 @@ export class Todo {
     default: TodoStatus.PENDING,
   })
   status!: TodoStatus;
+
+  @Column({ type: 'uuid' })
+  userId!: string;
+
+  @ManyToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'userId' })
+  user!: User;
 
   @CreateDateColumn()
   createdAt!: Date;
