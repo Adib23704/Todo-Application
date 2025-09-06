@@ -99,7 +99,10 @@ describe('TodoForm', () => {
     const submitButton = screen.getByRole('button', { name: 'Adding...' });
 
     expect(submitButton).toBeDisabled();
-    expect(submitButton).toHaveClass('opacity-50', 'cursor-not-allowed');
+    expect(submitButton).toHaveClass(
+      'disabled:opacity-50',
+      'disabled:cursor-not-allowed'
+    );
   });
 
   it('disables submit button when title is empty', async () => {

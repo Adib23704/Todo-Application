@@ -34,7 +34,7 @@ describe('TodoItem', () => {
     expect(screen.getByText('Test Todo')).toBeInTheDocument();
     expect(screen.getByText('Test Description')).toBeInTheDocument();
     expect(screen.getByText('PENDING')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('PENDING')).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toHaveValue(TodoStatus.PENDING);
   });
 
   it('calls onUpdate when status is changed', async () => {
@@ -48,7 +48,7 @@ describe('TodoItem', () => {
       />
     );
 
-    const statusSelect = screen.getByDisplayValue('PENDING');
+    const statusSelect = screen.getByRole('combobox');
     await user.selectOptions(statusSelect, TodoStatus.IN_PROGRESS);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(1, {

@@ -3,10 +3,12 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { TodoController } from './todo.controller';
 import { TodoService } from './todo.service';
+import { TypeormTodoRepository } from './typeorm-todo.repository';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Todo } from './todo.entity';
 import { TodoStatus } from './todo-status.enum';
-import { CreateTodoDto, UpdateTodoDto } from './dto';
+import { CreateTodoDto } from './dto/create-todo.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 
 describe('TodoController (e2e)', () => {
   let app: INestApplication;
@@ -17,7 +19,6 @@ describe('TodoController (e2e)', () => {
     findById: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
-    findByUserId: jest.fn(),
   };
 
   const mockJwtAuthGuard = {
@@ -25,20 +26,18 @@ describe('TodoController (e2e)', () => {
   };
 
   const mockUser = {
-    id: 1,
+    id: '1',
     username: 'testuser',
     email: 'test@example.com',
   };
 
   const mockTodo: Todo = {
-    id: 1,
+    id: '1',
     title: 'Test Todo',
     description: 'Test Description',
     status: TodoStatus.PENDING,
     createdAt: new Date(),
     updatedAt: new Date(),
-    userId: 1,
-    user: mockUser,
   };
 
   beforeEach(async () => {
@@ -47,7 +46,7 @@ describe('TodoController (e2e)', () => {
       providers: [
         TodoService,
         {
-          provide: 'TodoRepository',
+          provide: TypeormTodoRepository,
           useValue: mockTodoRepository,
         },
       ],
@@ -59,7 +58,7 @@ describe('TodoController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
 
-    app.use((req, res, next) => {
+    app.use((req: any, res: any, next: any) => {
       req.user = mockUser;
       next();
     });
@@ -76,11 +75,10 @@ describe('TodoController (e2e)', () => {
     const createTodoDto: CreateTodoDto = {
       title: 'New Todo',
       description: 'New Description',
-      status: TodoStatus.PENDING,
     };
 
     it('should create a new todo successfully', async () => {
-      const expectedTodo = { ...mockTodo, ...createTodoDto, id: 2 };
+      const expectedTodo = { ...mockTodo, ...createTodoDto, id: '2' };
       mockTodoRepository.create.mockResolvedValue(expectedTodo);
 
       const response = await request(app.getHttpServer())
@@ -89,7 +87,7 @@ describe('TodoController (e2e)', () => {
         .expect(201);
 
       expect(response.body).toMatchObject({
-        id: 2,
+        id: '2',
         title: 'New Todo',
         description: 'New Description',
         status: 'PENDING',
@@ -98,7 +96,6 @@ describe('TodoController (e2e)', () => {
       expect(mockTodoRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           ...createTodoDto,
-          userId: 1,
         }),
       );
     });
@@ -120,9 +117,9 @@ describe('TodoController (e2e)', () => {
     it('should return all todos for the authenticated user', async () => {
       const mockTodos = [
         mockTodo,
-        { ...mockTodo, id: 2, title: 'Second Todo' },
+        { ...mockTodo, id: '2', title: 'Second Todo' },
       ];
-      mockTodoRepository.findByUserId.mockResolvedValue(mockTodos);
+      mockTodoRepository.findAll.mockResolvedValue(mockTodos);
 
       const response = await request(app.getHttpServer())
         .get('/todos')
@@ -130,16 +127,16 @@ describe('TodoController (e2e)', () => {
 
       expect(response.body).toHaveLength(2);
       expect(response.body[0]).toMatchObject({
-        id: 1,
+        id: '1',
         title: 'Test Todo',
         status: 'PENDING',
       });
 
-      expect(mockTodoRepository.findByUserId).toHaveBeenCalledWith(1);
+      expect(mockTodoRepository.findAll).toHaveBeenCalled();
     });
 
     it('should return empty array when no todos exist', async () => {
-      mockTodoRepository.findByUserId.mockResolvedValue([]);
+      mockTodoRepository.findAll.mockResolvedValue([]);
 
       const response = await request(app.getHttpServer())
         .get('/todos')
@@ -158,12 +155,12 @@ describe('TodoController (e2e)', () => {
         .expect(200);
 
       expect(response.body).toMatchObject({
-        id: 1,
+        id: '1',
         title: 'Test Todo',
         status: 'PENDING',
       });
 
-      expect(mockTodoRepository.findById).toHaveBeenCalledWith(1);
+      expect(mockTodoRepository.findById).toHaveBeenCalledWith('1');
     });
 
     it('should return 404 when todo not found', async () => {
@@ -176,7 +173,6 @@ describe('TodoController (e2e)', () => {
   describe('/todos/:id (PUT)', () => {
     const updateTodoDto: UpdateTodoDto = {
       title: 'Updated Todo',
-      status: TodoStatus.IN_PROGRESS,
     };
 
     it('should update a todo successfully', async () => {
@@ -190,12 +186,14 @@ describe('TodoController (e2e)', () => {
         .expect(200);
 
       expect(response.body).toMatchObject({
-        id: 1,
+        id: '1',
         title: 'Updated Todo',
-        status: 'IN_PROGRESS',
       });
 
-      expect(mockTodoRepository.update).toHaveBeenCalledWith(1, updateTodoDto);
+      expect(mockTodoRepository.update).toHaveBeenCalledWith(
+        '1',
+        updateTodoDto,
+      );
     });
 
     it('should return 404 when updating non-existent todo', async () => {
@@ -213,9 +211,9 @@ describe('TodoController (e2e)', () => {
       mockTodoRepository.findById.mockResolvedValue(mockTodo);
       mockTodoRepository.delete.mockResolvedValue(undefined);
 
-      await request(app.getHttpServer()).delete('/todos/1').expect(200);
+      await request(app.getHttpServer()).delete('/todos/1').expect(204);
 
-      expect(mockTodoRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockTodoRepository.delete).toHaveBeenCalledWith('1');
     });
 
     it('should return 404 when deleting non-existent todo', async () => {

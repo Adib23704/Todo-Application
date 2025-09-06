@@ -23,10 +23,13 @@ export class AuthService {
   async register(registerDto: RegisterDto): Promise<{ token: string }> {
     const { email, password } = registerDto;
 
+    console.log('User registration attempt');
+
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
     if (existingUser) {
+      console.log('Registration failed: User already exists');
       throw new ConflictException('User with this email already exists');
     }
 
@@ -40,6 +43,8 @@ export class AuthService {
 
     const savedUser = await this.userRepository.save(user);
 
+    console.log('User registered successfully');
+
     const payload = { sub: savedUser.id, email: savedUser.email };
     const token = await this.jwtService.signAsync(payload);
 
@@ -50,15 +55,21 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<{ token: string }> {
     const { email, password } = loginDto;
 
+    console.log('User login attempt');
+
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
+      console.log('Login failed: User not found');
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      console.log('Login failed: Invalid password');
       throw new UnauthorizedException('Invalid credentials');
     }
+
+    console.log('User login successful');
 
     const payload = { sub: user.id, email: user.email };
     const token = await this.jwtService.signAsync(payload);
@@ -70,8 +81,12 @@ export class AuthService {
   async validateUser(userId: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
+      console.log('User validation failed: User not found');
       throw new UnauthorizedException('User not found');
     }
+
+    console.log('User validation successful');
+
     return user;
   }
 }

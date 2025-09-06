@@ -119,7 +119,13 @@ export default function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
                 Edit
               </button>
               <button
-                onClick={() => onDelete(todo.id)}
+                onClick={() => {
+                  if (
+                    window.confirm('Are you sure you want to delete this todo?')
+                  ) {
+                    onDelete(todo.id);
+                  }
+                }}
                 className='px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700'
               >
                 Delete

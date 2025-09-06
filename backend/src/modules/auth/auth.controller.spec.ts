@@ -11,6 +11,10 @@ import * as bcrypt from 'bcrypt';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  let authService: AuthService;
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  let userRepository: Repository<User>;
 
   const mockUserRepository = {
     create: jest.fn(),
@@ -19,7 +23,7 @@ describe('AuthController (e2e)', () => {
   };
 
   const mockJwtService = {
-    sign: jest.fn(() => 'mock-token'),
+    signAsync: jest.fn(() => 'mock-token'),
   };
 
   beforeEach(async () => {
@@ -55,7 +59,6 @@ describe('AuthController (e2e)', () => {
 
   describe('/auth/register (POST)', () => {
     const registerDto = {
-      username: 'testuser',
       email: 'test@example.com',
       password: 'password123',
     };
@@ -79,15 +82,10 @@ describe('AuthController (e2e)', () => {
         .send(registerDto)
         .expect(201);
 
-      expect(response.body).toHaveProperty('access_token', 'mock-token');
-      expect(response.body).toHaveProperty('user');
-      expect(response.body.user).toHaveProperty('id', 1);
-      expect(response.body.user).toHaveProperty('username', 'testuser');
-      expect(response.body.user).toHaveProperty('email', 'test@example.com');
-      expect(response.body.user).not.toHaveProperty('password');
+      expect(response.body).toHaveProperty('token', 'mock-token');
     });
 
-    it('should return 400 if user already exists', async () => {
+    it('should return 409 if user already exists', async () => {
       const existingUser = {
         id: 1,
         username: 'testuser',
@@ -98,12 +96,11 @@ describe('AuthController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/auth/register')
         .send(registerDto)
-        .expect(400);
+        .expect(409);
     });
 
     it('should return 400 for invalid input', async () => {
       const invalidDto = {
-        username: '',
         email: 'invalid-email',
         password: '123',
       };
@@ -117,7 +114,7 @@ describe('AuthController (e2e)', () => {
 
   describe('/auth/login (POST)', () => {
     const loginDto = {
-      username: 'testuser',
+      email: 'test@example.com',
       password: 'password123',
     };
 
@@ -138,11 +135,7 @@ describe('AuthController (e2e)', () => {
         .send(loginDto)
         .expect(200);
 
-      expect(response.body).toHaveProperty('access_token', 'mock-token');
-      expect(response.body).toHaveProperty('user');
-      expect(response.body.user).toHaveProperty('id', 1);
-      expect(response.body.user).toHaveProperty('username', 'testuser');
-      expect(response.body.user).not.toHaveProperty('password');
+      expect(response.body).toHaveProperty('token', 'mock-token');
     });
 
     it('should return 401 for invalid username', async () => {
@@ -156,8 +149,8 @@ describe('AuthController (e2e)', () => {
 
     it('should return 401 for invalid password', async () => {
       const mockUser = {
-        id: 1,
-        username: 'testuser',
+        id: '1',
+        email: 'test@example.com',
         password: await bcrypt.hash('different-password', 10),
       };
 
