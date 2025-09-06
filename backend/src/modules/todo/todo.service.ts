@@ -7,11 +7,9 @@ import { TodoStatus } from './todo-status.enum';
 
 @Injectable()
 export class TodoService {
-  constructor(
-    private readonly todoRepository: TypeormTodoRepository,
-  ) {}
+  constructor(private readonly todoRepository: TypeormTodoRepository) {}
 
-  // Create a new todo 
+  // Create a new todo
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     return await this.todoRepository.create(createTodoDto);
   }
@@ -36,7 +34,7 @@ export class TodoService {
     if (!existingTodo) {
       throw new NotFoundException(`Todo with ID ${id} not found`);
     }
-    
+
     return await this.todoRepository.update(id, updateTodoDto);
   }
 
@@ -46,7 +44,7 @@ export class TodoService {
     if (!existingTodo) {
       throw new NotFoundException(`Todo with ID ${id} not found`);
     }
-    
+
     await this.todoRepository.delete(id);
   }
 }

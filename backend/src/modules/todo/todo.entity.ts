@@ -4,22 +4,22 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { TodoStatus } from "./todo-status.enum";
+} from 'typeorm';
+import { TodoStatus } from './todo-status.enum';
 
-@Entity("todos")
+@Entity('todos')
 export class Todo {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: "varchar", length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title!: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: TodoStatus,
     default: TodoStatus.PENDING,
   })

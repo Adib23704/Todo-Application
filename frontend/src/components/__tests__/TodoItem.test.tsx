@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TodoItem from '../TodoItem';
 import { TodoStatus } from '@/types';
@@ -24,7 +24,11 @@ describe('TodoItem', () => {
 
   it('renders todo information correctly', () => {
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     expect(screen.getByText('Test Todo')).toBeInTheDocument();
@@ -35,40 +39,56 @@ describe('TodoItem', () => {
 
   it('calls onUpdate when status is changed', async () => {
     const user = userEvent.setup();
-    
+
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     const statusSelect = screen.getByDisplayValue('PENDING');
     await user.selectOptions(statusSelect, TodoStatus.IN_PROGRESS);
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(1, { status: TodoStatus.IN_PROGRESS });
+    expect(mockOnUpdate).toHaveBeenCalledWith(1, {
+      status: TodoStatus.IN_PROGRESS,
+    });
   });
 
   it('calls onDelete when delete button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     window.confirm = jest.fn(() => true);
 
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     const deleteButton = screen.getByText('Delete');
     await user.click(deleteButton);
 
     expect(mockOnDelete).toHaveBeenCalledWith(1);
-    expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this todo?');
+    expect(window.confirm).toHaveBeenCalledWith(
+      'Are you sure you want to delete this todo?'
+    );
   });
 
   it('does not call onDelete when user cancels confirmation', async () => {
     const user = userEvent.setup();
-    
+
     window.confirm = jest.fn(() => false);
 
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     const deleteButton = screen.getByText('Delete');
@@ -79,9 +99,13 @@ describe('TodoItem', () => {
 
   it('enters edit mode when edit button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     const editButton = screen.getByText('Edit');
@@ -95,9 +119,13 @@ describe('TodoItem', () => {
 
   it('saves changes when save button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     const editButton = screen.getByText('Edit');
@@ -118,9 +146,13 @@ describe('TodoItem', () => {
 
   it('cancels changes when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
     const editButton = screen.getByText('Edit');
@@ -139,22 +171,43 @@ describe('TodoItem', () => {
 
   it('applies correct status color classes', () => {
     const { rerender } = render(
-      <TodoItem todo={mockTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={mockTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
 
-    expect(screen.getByText('PENDING')).toHaveClass('bg-yellow-100', 'text-yellow-800');
+    expect(screen.getByText('PENDING')).toHaveClass(
+      'bg-yellow-100',
+      'text-yellow-800'
+    );
 
     const inProgressTodo = { ...mockTodo, status: TodoStatus.IN_PROGRESS };
     rerender(
-      <TodoItem todo={inProgressTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={inProgressTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
-    expect(screen.getByText('IN PROGRESS')).toHaveClass('bg-blue-100', 'text-blue-800');
+    expect(screen.getByText('IN PROGRESS')).toHaveClass(
+      'bg-blue-100',
+      'text-blue-800'
+    );
 
     const doneTodo = { ...mockTodo, status: TodoStatus.DONE };
     rerender(
-      <TodoItem todo={doneTodo} onUpdate={mockOnUpdate} onDelete={mockOnDelete} />
+      <TodoItem
+        todo={doneTodo}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
+      />
     );
-    expect(screen.getByText('DONE')).toHaveClass('bg-green-100', 'text-green-800');
+    expect(screen.getByText('DONE')).toHaveClass(
+      'bg-green-100',
+      'text-green-800'
+    );
   });
 
   it('shows creation and update dates', () => {
@@ -165,10 +218,10 @@ describe('TodoItem', () => {
     };
 
     render(
-      <TodoItem 
-        todo={todoWithDifferentDates} 
-        onUpdate={mockOnUpdate} 
-        onDelete={mockOnDelete} 
+      <TodoItem
+        todo={todoWithDifferentDates}
+        onUpdate={mockOnUpdate}
+        onDelete={mockOnDelete}
       />
     );
 

@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Todo } from './todo.entity';
 import { TodoStatus } from './todo-status.enum';
 import { TypeormTodoRepository } from './typeorm-todo.repository';
@@ -18,7 +17,6 @@ const mockTodoRepository = {
 
 describe('TypeormTodoRepository', () => {
   let repository: TypeormTodoRepository;
-  let todoRepository: Repository<Todo>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +30,6 @@ describe('TypeormTodoRepository', () => {
     }).compile();
 
     repository = module.get<TypeormTodoRepository>(TypeormTodoRepository);
-    todoRepository = module.get<Repository<Todo>>(getRepositoryToken(Todo));
   });
 
   beforeEach(() => {
@@ -150,7 +147,7 @@ describe('TypeormTodoRepository', () => {
       mockTodoRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        repository.update('non-existent-id', { title: 'Updated' })
+        repository.update('non-existent-id', { title: 'Updated' }),
       ).rejects.toThrow('Todo with ID non-existent-id not found');
     });
   });
@@ -168,7 +165,7 @@ describe('TypeormTodoRepository', () => {
       mockTodoRepository.delete.mockResolvedValue({ affected: 0 });
 
       await expect(repository.delete('non-existent-id')).rejects.toThrow(
-        'Todo with ID non-existent-id not found'
+        'Todo with ID non-existent-id not found',
       );
     });
   });

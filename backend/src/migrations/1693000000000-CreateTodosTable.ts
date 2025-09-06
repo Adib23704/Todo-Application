@@ -44,7 +44,7 @@ export class CreateTodosTable1693000000000 implements MigrationInterface {
           },
         ],
       }),
-      true
+      true,
     );
   }
 

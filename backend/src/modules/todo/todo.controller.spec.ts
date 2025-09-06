@@ -4,14 +4,12 @@ import request from 'supertest';
 import { TodoController } from './todo.controller';
 import { TodoService } from './todo.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TodoRepository } from './todo-repository.interface';
 import { Todo } from './todo.entity';
 import { TodoStatus } from './todo-status.enum';
 import { CreateTodoDto, UpdateTodoDto } from './dto';
 
 describe('TodoController (e2e)', () => {
   let app: INestApplication;
-  let todoService: TodoService;
 
   const mockTodoRepository = {
     create: jest.fn(),
@@ -67,8 +65,6 @@ describe('TodoController (e2e)', () => {
     });
 
     await app.init();
-
-    todoService = moduleFixture.get<TodoService>(TodoService);
   });
 
   afterEach(async () => {
@@ -122,7 +118,10 @@ describe('TodoController (e2e)', () => {
 
   describe('/todos (GET)', () => {
     it('should return all todos for the authenticated user', async () => {
-      const mockTodos = [mockTodo, { ...mockTodo, id: 2, title: 'Second Todo' }];
+      const mockTodos = [
+        mockTodo,
+        { ...mockTodo, id: 2, title: 'Second Todo' },
+      ];
       mockTodoRepository.findByUserId.mockResolvedValue(mockTodos);
 
       const response = await request(app.getHttpServer())
@@ -170,9 +169,7 @@ describe('TodoController (e2e)', () => {
     it('should return 404 when todo not found', async () => {
       mockTodoRepository.findById.mockResolvedValue(null);
 
-      await request(app.getHttpServer())
-        .get('/todos/999')
-        .expect(404);
+      await request(app.getHttpServer()).get('/todos/999').expect(404);
     });
   });
 
@@ -216,9 +213,7 @@ describe('TodoController (e2e)', () => {
       mockTodoRepository.findById.mockResolvedValue(mockTodo);
       mockTodoRepository.delete.mockResolvedValue(undefined);
 
-      await request(app.getHttpServer())
-        .delete('/todos/1')
-        .expect(200);
+      await request(app.getHttpServer()).delete('/todos/1').expect(200);
 
       expect(mockTodoRepository.delete).toHaveBeenCalledWith(1);
     });
@@ -226,9 +221,7 @@ describe('TodoController (e2e)', () => {
     it('should return 404 when deleting non-existent todo', async () => {
       mockTodoRepository.findById.mockResolvedValue(null);
 
-      await request(app.getHttpServer())
-        .delete('/todos/999')
-        .expect(404);
+      await request(app.getHttpServer()).delete('/todos/999').expect(404);
     });
   });
 
@@ -240,27 +233,21 @@ describe('TodoController (e2e)', () => {
     it('should require authentication for all endpoints', async () => {
       mockJwtAuthGuard.canActivate.mockReturnValue(false);
 
-      await request(app.getHttpServer())
-        .get('/todos')
-        .expect(403);
+      await request(app.getHttpServer()).get('/todos').expect(403);
 
       await request(app.getHttpServer())
         .post('/todos')
         .send({ title: 'Test', description: 'Test' })
         .expect(403);
 
-      await request(app.getHttpServer())
-        .get('/todos/1')
-        .expect(403);
+      await request(app.getHttpServer()).get('/todos/1').expect(403);
 
       await request(app.getHttpServer())
         .put('/todos/1')
         .send({ title: 'Updated' })
         .expect(403);
 
-      await request(app.getHttpServer())
-        .delete('/todos/1')
-        .expect(403);
+      await request(app.getHttpServer()).delete('/todos/1').expect(403);
     });
   });
 });

@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export class ApiClient {
   private baseUrl: string;
@@ -6,22 +6,22 @@ export class ApiClient {
 
   constructor() {
     this.baseUrl = API_BASE_URL;
-    if (typeof window !== "undefined") {
-      this.token = localStorage.getItem("token");
+    if (typeof window !== 'undefined') {
+      this.token = localStorage.getItem('token');
     }
   }
 
   setToken(token: string) {
     this.token = token;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("token", token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
     }
   }
 
   clearToken() {
     this.token = null;
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
     }
   }
 
@@ -31,7 +31,7 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...options.headers,
     };
 
@@ -53,25 +53,25 @@ export class ApiClient {
   }
 
   async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "GET" });
+    return this.request<T>(endpoint, { method: 'GET' });
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: "POST",
+      method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: "PUT",
+      method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "DELETE" });
+    return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }
 

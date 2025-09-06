@@ -11,8 +11,6 @@ import * as bcrypt from 'bcrypt';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
-  let authService: AuthService;
-  let userRepository: Repository<User>;
 
   const mockUserRepository = {
     create: jest.fn(),
@@ -45,7 +43,9 @@ describe('AuthController (e2e)', () => {
     await app.init();
 
     authService = moduleFixture.get<AuthService>(AuthService);
-    userRepository = moduleFixture.get<Repository<User>>(getRepositoryToken(User));
+    userRepository = moduleFixture.get<Repository<User>>(
+      getRepositoryToken(User),
+    );
   });
 
   afterEach(async () => {
@@ -88,7 +88,11 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should return 400 if user already exists', async () => {
-      const existingUser = { id: 1, username: 'testuser', email: 'test@example.com' };
+      const existingUser = {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+      };
       mockUserRepository.findOne.mockResolvedValue(existingUser);
 
       await request(app.getHttpServer())

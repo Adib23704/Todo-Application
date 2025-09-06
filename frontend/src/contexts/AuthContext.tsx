@@ -40,7 +40,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (data: RegisterDto) => {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/register', data);
+      const response = await apiClient.post<AuthResponse>(
+        '/auth/register',
+        data
+      );
       apiClient.setToken(response.access_token);
       setUser(response.user);
     } catch (error) {
