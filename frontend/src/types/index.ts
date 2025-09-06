@@ -35,12 +35,12 @@ export interface User {
 }
 
 export interface AuthResponse {
-  access_token: string;
+  token: string;
   user: User;
 }
 
 export interface LoginDto {
-  username: string;
+  email: string;
   password: string;
 }
 

@@ -20,23 +20,24 @@ export class AuthService {
   ) {}
 
   // Register a new user
-  async register(registerDto: RegisterDto): Promise<{ token: string }> {
-    const { email, password } = registerDto;
+  async register(registerDto: RegisterDto): Promise<{ token: string, user: User }> {
+    const { username, email, password } = registerDto;
 
     console.log('User registration attempt');
 
     const existingUser = await this.userRepository.findOne({
-      where: { email },
+      where: [{ email }, { username }],
     });
     if (existingUser) {
       console.log('Registration failed: User already exists');
-      throw new ConflictException('User with this email already exists');
+      throw new ConflictException('User with this email or username already exists');
     }
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const user = this.userRepository.create({
+      username,
       email,
       password: hashedPassword,
     });
@@ -48,11 +49,11 @@ export class AuthService {
     const payload = { sub: savedUser.id, email: savedUser.email };
     const token = await this.jwtService.signAsync(payload);
 
-    return { token };
+    return { token, user };
   }
 
   // Login an existing user
-  async login(loginDto: LoginDto): Promise<{ token: string }> {
+  async login(loginDto: LoginDto): Promise<{ token: string, user: User }> {
     const { email, password } = loginDto;
 
     console.log('User login attempt');
@@ -74,7 +75,7 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email };
     const token = await this.jwtService.signAsync(payload);
 
-    return { token };
+    return { token, user };
   }
 
   // Validate user by ID

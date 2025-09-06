@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateTodoDto, TodoStatus } from '@/types';
+import { CreateTodoDto } from '@/types';
 
 interface TodoFormProps {
   onSubmit: (data: CreateTodoDto) => void;
@@ -12,7 +12,6 @@ export default function TodoForm({ onSubmit, loading = false }: TodoFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    status: TodoStatus.PENDING,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,7 +22,6 @@ export default function TodoForm({ onSubmit, loading = false }: TodoFormProps) {
     setFormData({
       title: '',
       description: '',
-      status: TodoStatus.PENDING,
     });
   };
 
@@ -56,7 +54,7 @@ export default function TodoForm({ onSubmit, loading = false }: TodoFormProps) {
             required
             value={formData.title}
             onChange={handleChange}
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+            className='w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
             placeholder='Enter todo title...'
           />
         </div>
@@ -74,29 +72,9 @@ export default function TodoForm({ onSubmit, loading = false }: TodoFormProps) {
             value={formData.description}
             onChange={handleChange}
             rows={3}
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+            className='w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
             placeholder='Enter todo description...'
           />
-        </div>
-
-        <div>
-          <label
-            htmlFor='status'
-            className='block text-sm font-medium text-gray-700 mb-1'
-          >
-            Status
-          </label>
-          <select
-            id='status'
-            name='status'
-            value={formData.status}
-            onChange={handleChange}
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-          >
-            <option value={TodoStatus.PENDING}>Pending</option>
-            <option value={TodoStatus.IN_PROGRESS}>In Progress</option>
-            <option value={TodoStatus.DONE}>Done</option>
-          </select>
         </div>
 
         <button

@@ -59,6 +59,7 @@ describe('AuthController (e2e)', () => {
 
   describe('/auth/register (POST)', () => {
     const registerDto = {
+      username: 'testuser',
       email: 'test@example.com',
       password: 'password123',
     };
@@ -101,6 +102,7 @@ describe('AuthController (e2e)', () => {
 
     it('should return 400 for invalid input', async () => {
       const invalidDto = {
+        username: 'testuser',
         email: 'invalid-email',
         password: '123',
       };

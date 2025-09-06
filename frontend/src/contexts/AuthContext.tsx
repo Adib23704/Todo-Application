@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (data: LoginDto) => {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/login', data);
-      apiClient.setToken(response.access_token);
+      apiClient.setToken(response.token);
       setUser(response.user);
     } catch (error) {
       throw error;
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         '/auth/register',
         data
       );
-      apiClient.setToken(response.access_token);
+      apiClient.setToken(response.token);
       setUser(response.user);
     } catch (error) {
       throw error;

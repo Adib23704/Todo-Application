@@ -104,7 +104,7 @@ export default function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
               <select
                 value={todo.status}
                 onChange={e => handleStatusChange(e.target.value as TodoStatus)}
-                className='px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                className='px-2 py-1 border border-gray-300 rounded text-sm text-black focus:outline-none focus:ring-2 focus:ring-indigo-500'
               >
                 <option value={TodoStatus.PENDING}>Pending</option>
                 <option value={TodoStatus.IN_PROGRESS}>In Progress</option>
