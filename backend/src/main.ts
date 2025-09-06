@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:3002', // Next.js default port
+    origin: 'http://localhost:3000', // Next.js default port
     credentials: true,
   });
 
@@ -21,7 +21,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3001;
   await app.listen(port);
 
   console.log(`Application is running on: http://localhost:${port}`);

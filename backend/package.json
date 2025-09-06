@@ -17,9 +17,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "typeorm": "typeorm-ts-node-commonjs",
-    "typeorm:migration:generate": "npm run typeorm -- migration:generate -d src/data-source.ts",
-    "typeorm:migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
-    "typeorm:migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts"
+    "migration:generate": "npm run typeorm -- migration:generate -d src/data-source.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts"
   },
   "keywords": [],
   "author": "",
