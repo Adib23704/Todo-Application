@@ -19,23 +19,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      apiClient.setToken(token);
-      apiClient
-        .get<User>('/auth/me')
-        .then(userData => {
+    const validateToken = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        apiClient.setToken(token);
+        try {
+          const userData = await apiClient.get<User>('/auth/me');
           setUser(userData);
-          setLoading(false);
-        })
-        .catch(error => {
+        } catch (error) {
           console.error('Token validation failed:', error);
           apiClient.clearToken();
-          setLoading(false);
-        });
-    } else {
+        }
+      }
       setLoading(false);
-    }
+    };
+
+    validateToken();
   }, []);
 
   const login = async (data: LoginDto) => {

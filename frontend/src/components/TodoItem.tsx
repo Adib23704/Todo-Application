@@ -99,7 +99,7 @@ export default function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
                 </p>
               )}
             </div>
-            <div className='ml-4 flex-shrink-0'>
+            <div className='ml-4 shrink-0'>
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(todo.status)}`}
               >

@@ -36,6 +36,8 @@ describe('TodoController (e2e)', () => {
     title: 'Test Todo',
     description: 'Test Description',
     status: TodoStatus.PENDING,
+    userId: '1',
+    user: mockUser as any,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

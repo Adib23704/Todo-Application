@@ -72,9 +72,10 @@ describe('TypeormTodoRepository', () => {
 
       mockTodoRepository.find.mockResolvedValue(mockTodos);
 
-      const todos = await repository.findAll();
+      const todos = await repository.findAll('user-id-1');
 
       expect(mockTodoRepository.find).toHaveBeenCalledWith({
+        where: { userId: 'user-id-1' },
         order: { createdAt: 'DESC' },
       });
       expect(todos).toEqual(mockTodos);
@@ -87,10 +88,13 @@ describe('TypeormTodoRepository', () => {
 
       mockTodoRepository.find.mockResolvedValue(mockPendingTodos);
 
-      const pendingTodos = await repository.findAll(TodoStatus.PENDING);
+      const pendingTodos = await repository.findAll(
+        'user-id-1',
+        TodoStatus.PENDING,
+      );
 
       expect(mockTodoRepository.find).toHaveBeenCalledWith({
-        where: { status: TodoStatus.PENDING },
+        where: { userId: 'user-id-1', status: TodoStatus.PENDING },
         order: { createdAt: 'DESC' },
       });
       expect(pendingTodos).toEqual(mockPendingTodos);
@@ -102,10 +106,10 @@ describe('TypeormTodoRepository', () => {
       const mockTodo = { id: 'test-id', title: 'Find Me' };
       mockTodoRepository.findOne.mockResolvedValue(mockTodo);
 
-      const foundTodo = await repository.findById('test-id');
+      const foundTodo = await repository.findById('test-id', 'user-id-1');
 
       expect(mockTodoRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'test-id' },
+        where: { id: 'test-id', userId: 'user-id-1' },
       });
       expect(foundTodo).toEqual(mockTodo);
     });
@@ -113,7 +117,10 @@ describe('TypeormTodoRepository', () => {
     it('should return null if todo not found', async () => {
       mockTodoRepository.findOne.mockResolvedValue(null);
 
-      const foundTodo = await repository.findById('non-existent-id');
+      const foundTodo = await repository.findById(
+        'non-existent-id',
+        'user-id-1',
+      );
 
       expect(foundTodo).toBeNull();
     });
@@ -130,15 +137,18 @@ describe('TypeormTodoRepository', () => {
       mockTodoRepository.update.mockResolvedValue({ affected: 1 });
       mockTodoRepository.findOne.mockResolvedValue(mockUpdatedTodo);
 
-      const updatedTodo = await repository.update('test-id', {
+      const updatedTodo = await repository.update('test-id', 'user-id-1', {
         title: 'Updated Title',
         status: TodoStatus.DONE,
       });
 
-      expect(mockTodoRepository.update).toHaveBeenCalledWith('test-id', {
-        title: 'Updated Title',
-        status: TodoStatus.DONE,
-      });
+      expect(mockTodoRepository.update).toHaveBeenCalledWith(
+        { id: 'test-id', userId: 'user-id-1' },
+        {
+          title: 'Updated Title',
+          status: TodoStatus.DONE,
+        },
+      );
       expect(updatedTodo).toEqual(mockUpdatedTodo);
     });
 
@@ -147,8 +157,10 @@ describe('TypeormTodoRepository', () => {
       mockTodoRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        repository.update('non-existent-id', { title: 'Updated' }),
-      ).rejects.toThrow('Todo with ID non-existent-id not found');
+        repository.update('non-existent-id', 'user-id-1', { title: 'Updated' }),
+      ).rejects.toThrow(
+        'Todo with ID non-existent-id not found or not owned by user',
+      );
     });
   });
 
@@ -156,16 +168,21 @@ describe('TypeormTodoRepository', () => {
     it('should delete a todo successfully', async () => {
       mockTodoRepository.delete.mockResolvedValue({ affected: 1 });
 
-      await repository.delete('test-id');
+      await repository.delete('test-id', 'user-id-1');
 
-      expect(mockTodoRepository.delete).toHaveBeenCalledWith('test-id');
+      expect(mockTodoRepository.delete).toHaveBeenCalledWith({
+        id: 'test-id',
+        userId: 'user-id-1',
+      });
     });
 
     it('should throw error if todo not found', async () => {
       mockTodoRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(repository.delete('non-existent-id')).rejects.toThrow(
-        'Todo with ID non-existent-id not found',
+      await expect(
+        repository.delete('non-existent-id', 'user-id-1'),
+      ).rejects.toThrow(
+        'Todo with ID non-existent-id not found or not owned by user',
       );
     });
   });
